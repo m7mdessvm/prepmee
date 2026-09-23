@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>تحضير الفروع</title>
 <meta name="theme-color" content="#2f7d5f">
-<!-- استدعاء مكتبة SheetJS لقراءة ملفات الإكسيل -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -39,9 +38,9 @@ main{padding:12px 14px 20px;max-width:640px;margin:0 auto;flex:1;width:100%;}
 .item-select-row label{font-size:14px;font-weight:600;flex:1;}
 .item-select-row .cnt{font-size:12.5px;color:var(--muted);}
 input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);}
-select{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;font-size:14px;font-weight:700;margin-bottom:8px;}
+select, input[type=text]{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;font-size:14px;font-weight:700;margin-bottom:8px;}
 .progress{font-size:12.5px;color:var(--muted);margin-bottom:6px;}
-.sticky-sub{position:sticky;top:70px;z-index:6;background:var(--card);padding:4px;border-radius:10px;margin-bottom:8px;}
+.sticky-sub{position:sticky;top:70px;z-index:6;background:var(--card);padding:8px;border-radius:10px;margin-bottom:8px;border:1px solid var(--border);}
 .branch-row{display:flex;align-items:center;justify-content:space-between;padding:11px 10px;border-radius:10px;margin-bottom:6px;background:var(--chip);cursor:pointer;}
 .branch-row.done{background:var(--accent-light);}
 .branch-row .bname{font-size:13.5px;font-weight:600;}
@@ -54,7 +53,7 @@ select{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);
 .review-name{font-weight:700;font-size:14px;}
 .review-sub{font-size:12px;color:var(--muted);}
 .review-body{display:flex;align-items:center;gap:10px;}
-.review-body input{width:70px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:15px;font-weight:700;text-align:center;}
+.review-body input{width:80px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:15px;font-weight:700;text-align:center;}
 .badge{flex:1;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:700;text-align:center;}
 .badge.ok{background:var(--accent-light);color:var(--accent);}
 .badge.bad{background:var(--danger-light);color:var(--danger);}
@@ -74,7 +73,6 @@ footer{text-align:center;padding:15px;font-size:12.5px;color:var(--muted);border
 <footer>by mohamed essam | essamohamedd76@gmail.com</footer>
 
 <script>
-// حماية بسيطة: تعطيل الزر الأيمن واختصارات الفحص
 document.addEventListener('contextmenu', event => event.preventDefault());
 document.onkeydown = function(e) {
   if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
@@ -82,9 +80,9 @@ document.onkeydown = function(e) {
   }
 };
 
-const DEFAULT_DATA = {"branches": ["Alexandria FP #1", "Alexandria FP #2", "Alexandria FP #3", "Mansoura FP #1", "Mansoura FP #2", "Port Said FP #1", "New Cairo FP #1", "New Cairo FP #2", "New Cairo FP #3", "New Cairo FP #4", "New Cairo FP #5", "New Cairo FP #6", "New Cairo FP #7", "New Cairo FP #8", "Mokattam FP #1", "Mokattam FP #2", "Shorouk FP #1", "Shorouk FP #2", "Shorouk FP #3", "Al Rehab City FP #1", "Al Rehab City FP #2", "Madinaty FP #1", "Madinaty FP #2", "Obour FP #1", "Obour FP #2", "Nasr City FP #1", "Nasr City FP #2", "Nasr City FP #3", "Nasr City FP #4", "Heliopolis FP #1", "Heliopolis FP #2", "Heliopolis FP #3", "Heliopolis FP #4", "Ain Shams FP #1", "Sheraton FP #1", "Nozha FP #1", "6th of October FP #1", "6th of October FP #2", "6th of October FP #3", "6th of October FP #4", "6th of October FP #5", "6th of October FP #6", "6th of October FP #7", "Sheikh Zayed City FP #1", "Sheikh Zayed City FP #2", "Sheikh Zayed City FP #3", "Sheikh Zayed City FP #4", "Hadayek El Ahram FP #1", "Haram FP #1", "Dokki FP #1", "Haram FP #2", "Garden City FP #1", "Agouza FP #1", "Al Manial FP #1", "Maadi FP #1", "Maadi FP #3", "Maadi FP #4", "Maadi FP #5", "Helwan FP #1", "Shobra FP #1", "El-Zaher FP #1", "Heliopolis FP #5"], "items": [{"n": "Taco Salad", "t": 918, "br": [{"b": "Alexandria FP #1", "q": 34}, {"b": "Alexandria FP #2", "q": 25}, {"b": "Alexandria FP #3", "q": 4}, {"b": "Mansoura FP #1", "q": 2}, {"b": "Mansoura FP #2", "q": 1}, {"b": "Port Said FP #1", "q": 6}, {"b": "New Cairo FP #1", "q": 28}, {"b": "New Cairo FP #2", "q": 9}, {"b": "New Cairo FP #3", "q": 24}, {"b": "New Cairo FP #4", "q": 26}, {"b": "New Cairo FP #5", "q": 23}, {"b": "New Cairo FP #6", "q": 18}, {"b": "New Cairo FP #7", "q": 31}, {"b": "New Cairo FP #8", "q": 16}, {"b": "Mokattam FP #1", "q": 15}, {"b": "Mokattam FP #2", "q": 15}, {"b": "Shorouk FP #1", "q": 11}, {"b": "Shorouk FP #2", "q": 14}, {"b": "Shorouk FP #3", "q": 5}, {"b": "Al Rehab City FP #1", "q": 15}, {"b": "Al Rehab City FP #2", "q": 15}, {"b": "Madinaty FP #1", "q": 8}, {"b": "Madinaty FP #2", "q": 11}, {"b": "Obour FP #1", "q": 22}, {"b": "Obour FP #2", "q": 9}, {"b": "Nasr City FP #1", "q": 18}, {"b": "Nasr City FP #2", "q": 21}, {"b": "Nasr City FP #3", "q": 8}, {"b": "Nasr City FP #4", "q": 18}, {"b": "Heliopolis FP #1", "q": 21}, {"b": "Heliopolis FP #2", "q": 11}, {"b": "Heliopolis FP #3", "q": 9}, {"b": "Heliopolis FP #4", "q": 5}, {"b": "Ain Shams FP #1", "q": 6}, {"b": "Sheraton FP #1", "q": 25}, {"b": "Nozha FP #1", "q": 12}, {"b": "6th of October FP #1", "q": 4}, {"b": "6th of October FP #2", "q": 19}, {"b": "6th of October FP #3", "q": 8}, {"b": "6th of October FP #4", "q": 17}, {"b": "6th of October FP #5", "q": 5}, {"b": "6th of October FP #6", "q": 22}, {"b": "6th of October FP #7", "q": 6}, {"b": "Sheikh Zayed City FP #1", "q": 25}, {"b": "Sheikh Zayed City FP #2", "q": 14}, {"b": "Sheikh Zayed City FP #3", "q": 17}, {"b": "Sheikh Zayed City FP #4", "q": 9}, {"b": "Hadayek El Ahram FP #1", "q": 8}, {"b": "Haram FP #1", "q": 10}, {"b": "Dokki FP #1", "q": 20}, {"b": "Haram FP #2", "q": 10}, {"b": "Garden City FP #1", "q": 19}, {"b": "Agouza FP #1", "q": 20}, {"b": "Al Manial FP #1", "q": 12}, {"b": "Maadi FP #1", "q": 17}, {"b": "Maadi FP #3", "q": 18}, {"b": "Maadi FP #4", "q": 19}, {"b": "Maadi FP #5", "q": 13}, {"b": "Helwan FP #1", "q": 9}, {"b": "Shobra FP #1", "q": 21}, {"b": "El-Zaher FP #1", "q": 29}, {"b": "Heliopolis FP #5", "q": 6}]}, {"n": "Classic Chicken Caesar Salad", "t": 847, "br": [{"b": "Alexandria FP #1", "q": 20}, {"b": "Alexandria FP #2", "q": 16}, {"b": "Alexandria FP #3", "q": 6}, {"b": "Mansoura FP #1", "q": 3}, {"b": "Mansoura FP #2", "q": 4}, {"b": "Port Said FP #1", "q": 8}, {"b": "New Cairo FP #1", "q": 32}, {"b": "New Cairo FP #2", "q": 10}, {"b": "New Cairo FP #3", "q": 16}, {"b": "New Cairo FP #4", "q": 21}, {"b": "New Cairo FP #5", "q": 17}, {"b": "New Cairo FP #6", "q": 18}, {"b": "New Cairo FP #7", "q": 40}, {"b": "New Cairo FP #8", "q": 14}, {"b": "Mokattam FP #1", "q": 11}, {"b": "Mokattam FP #2", "q": 11}, {"b": "Shorouk FP #1", "q": 9}, {"b": "Shorouk FP #2", "q": 11}, {"b": "Shorouk FP #3", "q": 9}, {"b": "Al Rehab City FP #1", "q": 11}, {"b": "Al Rehab City FP #2", "q": 10}, {"b": "Madinaty FP #1", "q": 6}, {"b": "Madinaty FP #2", "q": 11}, {"b": "Obour FP #1", "q": 22}, {"b": "Obour FP #2", "q": 15}, {"b": "Nasr City FP #1", "q": 19}, {"b": "Nasr City FP #2", "q": 20}, {"b": "Nasr City FP #3", "q": 8}, {"b": "Nasr City FP #4", "q": 14}, {"b": "Heliopolis FP #1", "q": 24}, {"b": "Heliopolis FP #2", "q": 12}, {"b": "Heliopolis FP #3", "q": 14}, {"b": "Heliopolis FP #4", "q": 8}, {"b": "Ain Shams FP #1", "q": 10}, {"b": "Sheraton FP #1", "q": 25}, {"b": "Nozha FP #1", "q": 7}, {"b": "6th of October FP #1", "q": 7}, {"b": "6th of October FP #2", "q": 16}, {"b": "6th of October FP #3", "q": 7}, {"b": "6th of October FP #4", "q": 13}, {"b": "6th of October FP #5", "q": 6}, {"b": "6th of October FP #6", "q": 22}, {"b": "6th of October FP #7", "q": 5}, {"b": "Sheikh Zayed City FP #1", "q": 18}, {"b": "Sheikh Zayed City FP #2", "q": 10}, {"b": "Sheikh Zayed City FP #3", "q": 12}, {"b": "Sheikh Zayed City FP #4", "q": 10}, {"b": "Hadayek El Ahram FP #1", "q": 10}, {"b": "Haram FP #1", "q": 10}, {"b": "Dokki FP #1", "q": 18}, {"b": "Haram FP #2", "q": 10}, {"b": "Garden City FP #1", "q": 16}, {"b": "Agouza FP #1", "q": 18}, {"b": "Al Manial FP #1", "q": 7}, {"b": "Maadi FP #1", "q": 21}, {"b": "Maadi FP #3", "q": 17}, {"b": "Maadi FP #4", "q": 19}, {"b": "Maadi FP #5", "q": 9}, {"b": "Helwan FP #1", "q": 10}, {"b": "Shobra FP #1", "q": 23}, {"b": "El-Zaher FP #1", "q": 17}, {"b": "Heliopolis FP #5", "q": 4}]}]};
+const DEFAULT_DATA = {"branches": ["Alexandria FP #1", "Alexandria FP #2", "Alexandria FP #3", "Mansoura FP #1", "Mansoura FP #2", "Port Said FP #1", "New Cairo FP #1", "New Cairo FP #2", "New Cairo FP #3", "New Cairo FP #4", "New Cairo FP #5", "New Cairo FP #6", "New Cairo FP #7", "New Cairo FP #8", "Mokattam FP #1", "Mokattam FP #2", "Shorouk FP #1", "Shorouk FP #2", "Shorouk FP #3", "Al Rehab City FP #1", "Al Rehab City FP #2", "Madinaty FP #1", "Madinaty FP #2", "Obour FP #1", "Obour FP #2", "Nasr City FP #1", "Nasr City FP #2", "Nasr City FP #3", "Nasr City FP #4", "Heliopolis FP #1", "Heliopolis FP #2", "Heliopolis FP #3", "Heliopolis FP #4", "Ain Shams FP #1", "Sheraton FP #1", "Nozha FP #1", "6th of October FP #1", "6th of October FP #2", "6th of October FP #3", "6th of October FP #4", "6th of October FP #5", "6th of October FP #6", "6th of October FP #7", "Sheikh Zayed City FP #1", "Sheikh Zayed City FP #2", "Sheikh Zayed City FP #3", "Sheikh Zayed City FP #4", "Hadayek El Ahram FP #1", "Haram FP #1", "Dokki FP #1", "Haram FP #2", "Garden City FP #1", "Agouza FP #1", "Al Manial FP #1", "Maadi FP #1", "Maadi FP #3", "Maadi FP #4", "Maadi FP #5", "Helwan FP #1", "Shobra FP #1", "El-Zaher FP #1", "Heliopolis FP #5"], "items": [{"n": "Premium Turkey Breast & Caramelized Onions Wrap", "t": 306, "br": [{"b": "Alexandria FP #1", "q": 10}, {"b": "Alexandria FP #2", "q": 5}, {"b": "Alexandria FP #3", "q": 4}, {"b": "Mansoura FP #1", "q": 4}]}, {"n": "Taco Salad", "t": 918, "br": [{"b": "Alexandria FP #1", "q": 34}, {"b": "Alexandria FP #2", "q": 25}]}]};
 
-let state = { data: null, selected: [], currentBranch: null, done: {}, have: {} };
+let state = { data: null, selected: [], currentBranch: null, done: {}, have: {}, branchSearchQuery: "" };
 
 function loadState(){
   try{
@@ -118,9 +116,9 @@ function toggleDone(item, branch){
 
 function doneCount(item){
   const it = state.data.items.find(i=>i.n===item);
-  if(!it) return {n:0,q:0,total:0};
-  let n=0,q=0;
-  it.br.forEach(b=>{ if(state.done[item] && state.done[item][b.b]){n++; q+=b.q;} });
+  if(!it) return {n:0, q:0, total:0};
+  let n=0, q=0;
+  it.br.forEach(b=>{ if(state.done[item] && state.done[item][b.b]){ n++; q+=b.q; } });
   return {n, q, total: it.br.length};
 }
 
@@ -179,19 +177,26 @@ function renderByBranch(){
     const it = state.data.items.find(i=>i.n===item);
     if(it) it.br.forEach(b=>{ branchSet[b.b] = branchSet[b.b] || []; branchSet[b.b].push({item, q:b.q}); });
   });
+  
+  // ترتيب الفروع تلقائياً الأكتمال أولاً ثم أبجدياً كالمعتاد
   const branches = Object.keys(branchSet).sort((a,b)=>{
     const fa = itemFullyDoneForBranch(a), fb = itemFullyDoneForBranch(b);
     return fa === fb ? a.localeCompare(b) : (fa ? 1 : -1);
   });
+
   if(!state.currentBranch || !branchSet[state.currentBranch]) state.currentBranch = branches[0];
   const cur = state.currentBranch;
   const list = branchSet[cur] || [];
   const doneN = list.filter(x=> state.done[x.item] && state.done[x.item][cur]).length;
   const full = itemFullyDoneForBranch(cur);
-  const opts = branches.map(br=>{
+  
+  const filteredBranches = branches.filter(br => br.toLowerCase().includes(state.branchSearchQuery.toLowerCase()));
+
+  const opts = filteredBranches.map(br=>{
     const f = itemFullyDoneForBranch(br);
     return `<option value="${esc(br)}" ${cur===br?'selected':''}>${f?'✅ ':''}${esc(br)}</option>`;
   }).join('');
+  
   const rows = list.map(x=>{
     const isDone = !!(state.done[x.item] && state.done[x.item][cur]);
     return `<div class="branch-row ${isDone?'done':''}" data-item="${esc(x.item)}" data-branch="${esc(cur)}">
@@ -199,28 +204,51 @@ function renderByBranch(){
       <span class="bqty">${x.q}</span>
     </div>`;
   }).join('');
-  return `<div class="sticky-sub"><select id="branchPicker">${opts}</select><div class="progress">${full?'✅ خلصت الفرع ده بالكامل':`خلصت ${doneN} من ${list.length} صنف`}</div></div><div class="card">${rows}</div>`;
+
+  return `
+  <div class="sticky-sub">
+    <input type="text" id="branchSearchInput" placeholder="🔍 ابحث عن اسم الفرع..." value="${esc(state.branchSearchQuery)}" style="margin-bottom:6px;" />
+    <select id="branchPicker">${opts.length > 0 ? opts : '<option disabled>لا يوجد فرع مطابق</option>'}</select>
+    <div class="progress">${full?'✅ خلصت الفرع ده بالكامل':`خلصت ${doneN} من ${list.length} صنف`}</div>
+  </div>
+  <div class="card">${rows}</div>`;
 }
 
-function badgeHtml(dc, have){
-  if(have === undefined || have === null || have === '') return {cls:'warn', text:'اكتب العدد اللي قدامك'};
-  const diff = Number(have) - dc.q;
-  if(diff === 0) return {cls:'ok', text:`تصفييير ✓ (${dc.q})`};
+function badgeHtml(remainingRequired, have){
+  if(have === undefined || have === null || have === '') return {cls:'warn', text:'اكتب العدد الباقي قدامك'};
   
-  if(diff > 0) return {cls:'warn', text:`تخييييش (زيادة ${diff})`};
-  return {cls:'bad', text:`تخييييش (ناقص ${Math.abs(diff)})`};
+  const realHave = Number(have);
+  const required = Number(remainingRequired);
+
+  if(realHave === required) {
+    return {cls:'ok', text:`تصفييير ✓ (${realHave})`};
+  }
+  
+  const diff = realHave - required;
+  if(diff > 0) {
+    return {cls:'warn', text:`تخييييش (زيادة ${diff})`};
+  } else {
+    return {cls:'bad', text:`تخييييش (ناقص ${Math.abs(diff)})`};
+  }
 }
 
 function renderReview(){
   if(!state.selected.length) return `<div class="card muted">اختار أصناف الأول من تبويب "اختيار الأصناف"</div>`;
-  const rows = state.selected.map((item,idx)=>{
-    const dc = doneCount(item);
-    const have = state.have[item];
-    const b = badgeHtml(dc, have);
+  const rows = state.selected.map((itemName, idx)=>{
+    const it = state.data.items.find(i => i.n === itemName);
+    const totalRequired = it ? it.t : 0;
+    const dc = doneCount(itemName);
+    const remainingRequired = totalRequired - dc.q;
+    const have = state.have[itemName];
+    const b = badgeHtml(remainingRequired, have);
+    
     return `<div class="review-row">
-      <div class="review-top"><div class="review-name">${esc(item)}</div><div class="review-sub">خلصت ${dc.n}/${dc.total} فرع</div></div>
+      <div class="review-top">
+        <div class="review-name">${esc(itemName)}</div>
+        <div class="review-sub">المطلوب للباقي: ${remainingRequired} | الخصم المكتمل: (${dc.q}) | التوتال: ${totalRequired} | (${dc.n}/${dc.total} فرع)</div>
+      </div>
       <div class="review-body">
-        <input type="number" inputmode="numeric" value="${have!==undefined?esc(have):''}" data-item="${esc(item)}">
+        <input type="number" inputmode="numeric" value="${have!==undefined?esc(have):''}" data-item="${esc(itemName)}">
         <div class="badge ${b.cls}" id="badge-${idx}">${b.text}</div>
       </div>
     </div>`;
@@ -253,6 +281,19 @@ function attachHandlers(){
     excelInput.onchange = handleFileUpload;
   }
 
+  const bSearch = document.getElementById('branchSearchInput');
+  if(bSearch){
+    bSearch.oninput = (e)=>{
+      state.branchSearchQuery = e.target.value;
+      render();
+      const bSearchNew = document.getElementById('branchSearchInput');
+      if(bSearchNew){
+        bSearchNew.focus();
+        bSearchNew.setSelectionRange(bSearchNew.value.length, bSearchNew.value.length);
+      }
+    };
+  }
+
   const bpicker = document.getElementById('branchPicker');
   if(bpicker) bpicker.onchange = ()=>{ state.currentBranch = bpicker.value; render(); };
   
@@ -262,11 +303,16 @@ function attachHandlers(){
   
   document.querySelectorAll('.review-body input').forEach((inp, idx)=>{
     inp.oninput = ()=>{
-      const item = inp.dataset.item;
-      state.have[item] = inp.value;
+      const itemName = inp.dataset.item;
+      state.have[itemName] = inp.value;
       saveState();
-      const dc = doneCount(item);
-      const b = badgeHtml(dc, inp.value);
+      
+      const it = state.data.items.find(i => i.n === itemName);
+      const totalRequired = it ? it.t : 0;
+      const dc = doneCount(itemName);
+      const remainingRequired = totalRequired - dc.q;
+      
+      const b = badgeHtml(remainingRequired, inp.value);
       const badgeEl = document.getElementById('badge-'+idx);
       if(badgeEl){ badgeEl.className = 'badge '+b.cls; badgeEl.textContent = b.text; }
     };
