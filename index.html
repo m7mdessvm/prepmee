@@ -178,7 +178,6 @@ function renderByBranch(){
     if(it) it.br.forEach(b=>{ branchSet[b.b] = branchSet[b.b] || []; branchSet[b.b].push({item, q:b.q}); });
   });
   
-  // ترتيب الفروع تلقائياً الأكتمال أولاً ثم أبجدياً كالمعتاد
   const branches = Object.keys(branchSet).sort((a,b)=>{
     const fa = itemFullyDoneForBranch(a), fb = itemFullyDoneForBranch(b);
     return fa === fb ? a.localeCompare(b) : (fa ? 1 : -1);
@@ -245,7 +244,7 @@ function renderReview(){
     return `<div class="review-row">
       <div class="review-top">
         <div class="review-name">${esc(itemName)}</div>
-        <div class="review-sub">المطلوب للباقي: ${remainingRequired} | الخصم المكتمل: (${dc.q}) | التوتال: ${totalRequired} | (${dc.n}/${dc.total} فرع)</div>
+        <div class="review-sub">التوتال: ${totalRequired} | (${dc.n}/${dc.total} فرع)</div>
       </div>
       <div class="review-body">
         <input type="number" inputmode="numeric" value="${have!==undefined?esc(have):''}" data-item="${esc(itemName)}">
