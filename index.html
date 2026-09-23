@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تحضير الفروع</title>
+<meta name="theme-color" content="#2f7d5f">
+<!-- استدعاء مكتبة SheetJS لقراءة ملفات الإكسيل -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#f6f5f2; --card:#ffffff; --text:#1e1e1e; --muted:#7a7a7a; --border:#e5e2db;
+  --accent:#2f7d5f; --accent-light:#e5f3ec; --danger:#c0392b; --danger-light:#fbe9e7;
+  --warn:#b8860b; --warn-light:#fbf3d9; --chip:#eef0f4;
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171a; --card:#1f2226; --text:#eef0f2; --muted:#9aa0a6; --border:#31353b;
+    --accent:#4fae86; --accent-light:#173226; --danger:#e07a6c; --danger-light:#3a1f1c;
+    --warn:#e0c26a; --warn-light:#332a10; --chip:#2a2e34;
+  }
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{background:var(--bg);color:var(--text);font-family:system-ui, -apple-system, sans-serif;display:flex;flex-direction:column;min-height:100vh;}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border);padding:12px 14px;}
+h1{font-size:17px;margin:0 0 8px;font-weight:700;}
+.tabs{display:flex;gap:6px;overflow-x:auto;}
+.tab{flex:none;padding:7px 12px;border-radius:20px;background:var(--chip);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.tab.active{background:var(--accent);color:#fff;}
+main{padding:12px 14px 20px;max-width:640px;margin:0 auto;flex:1;width:100%;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:10px;}
+.muted{color:var(--muted);font-size:12.5px;}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:700;cursor:pointer;display:inline-block;text-align:center;}
+.btn.secondary{background:var(--chip);color:var(--text);}
+.item-select-row{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;border-bottom:1px solid var(--border);}
+.item-select-row:last-child{border-bottom:none;}
+.item-select-row label{font-size:14px;font-weight:600;flex:1;}
+.item-select-row .cnt{font-size:12.5px;color:var(--muted);}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);}
+select{width:100%;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;font-size:14px;font-weight:700;margin-bottom:8px;}
+.progress{font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+.sticky-sub{position:sticky;top:70px;z-index:6;background:var(--card);padding:4px;border-radius:10px;margin-bottom:8px;}
+.branch-row{display:flex;align-items:center;justify-content:space-between;padding:11px 10px;border-radius:10px;margin-bottom:6px;background:var(--chip);cursor:pointer;}
+.branch-row.done{background:var(--accent-light);}
+.branch-row .bname{font-size:13.5px;font-weight:600;}
+.branch-row .bqty{font-size:14px;font-weight:700;background:var(--card);border-radius:8px;padding:3px 9px;}
+.branch-row.done .bqty{color:var(--accent);}
+.check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);margin-inline-end:10px;display:flex;align-items:center;justify-content:center;}
+.branch-row.done .check{background:var(--accent);border-color:var(--accent);color:#fff;}
+.review-row{background:var(--chip);border-radius:12px;padding:12px;margin-bottom:10px;}
+.review-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.review-name{font-weight:700;font-size:14px;}
+.review-sub{font-size:12px;color:var(--muted);}
+.review-body{display:flex;align-items:center;gap:10px;}
+.review-body input{width:70px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:15px;font-weight:700;text-align:center;}
+.badge{flex:1;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:700;text-align:center;}
+.badge.ok{background:var(--accent-light);color:var(--accent);}
+.badge.bad{background:var(--danger-light);color:var(--danger);}
+.badge.warn{background:var(--warn-light);color:var(--warn);}
+.upload-box{border:2px dashed var(--border);padding:25px 15px;border-radius:12px;text-align:center;margin-bottom:10px;cursor:pointer;background:var(--chip);}
+.upload-box:hover{border-color:var(--accent);}
+footer{text-align:center;padding:15px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--border);background:var(--card);margin-top:auto;font-weight:600;}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="pageTitle">تحضير الفروع</h1>
+  <div class="tabs" id="tabsBar"></div>
+</header>
+<main id="app"></main>
+
+<footer>by mohamed essam | essamohamedd76@gmail.com</footer>
+
+<script>
+// حماية بسيطة: تعطيل الزر الأيمن واختصارات الفحص
+document.addEventListener('contextmenu', event => event.preventDefault());
+document.onkeydown = function(e) {
+  if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+    return false;
+  }
+};
+
+const DEFAULT_DATA = {"branches": ["Alexandria FP #1", "Alexandria FP #2", "Alexandria FP #3", "Mansoura FP #1", "Mansoura FP #2", "Port Said FP #1", "New Cairo FP #1", "New Cairo FP #2", "New Cairo FP #3", "New Cairo FP #4", "New Cairo FP #5", "New Cairo FP #6", "New Cairo FP #7", "New Cairo FP #8", "Mokattam FP #1", "Mokattam FP #2", "Shorouk FP #1", "Shorouk FP #2", "Shorouk FP #3", "Al Rehab City FP #1", "Al Rehab City FP #2", "Madinaty FP #1", "Madinaty FP #2", "Obour FP #1", "Obour FP #2", "Nasr City FP #1", "Nasr City FP #2", "Nasr City FP #3", "Nasr City FP #4", "Heliopolis FP #1", "Heliopolis FP #2", "Heliopolis FP #3", "Heliopolis FP #4", "Ain Shams FP #1", "Sheraton FP #1", "Nozha FP #1", "6th of October FP #1", "6th of October FP #2", "6th of October FP #3", "6th of October FP #4", "6th of October FP #5", "6th of October FP #6", "6th of October FP #7", "Sheikh Zayed City FP #1", "Sheikh Zayed City FP #2", "Sheikh Zayed City FP #3", "Sheikh Zayed City FP #4", "Hadayek El Ahram FP #1", "Haram FP #1", "Dokki FP #1", "Haram FP #2", "Garden City FP #1", "Agouza FP #1", "Al Manial FP #1", "Maadi FP #1", "Maadi FP #3", "Maadi FP #4", "Maadi FP #5", "Helwan FP #1", "Shobra FP #1", "El-Zaher FP #1", "Heliopolis FP #5"], "items": [{"n": "Taco Salad", "t": 918, "br": [{"b": "Alexandria FP #1", "q": 34}, {"b": "Alexandria FP #2", "q": 25}, {"b": "Alexandria FP #3", "q": 4}, {"b": "Mansoura FP #1", "q": 2}, {"b": "Mansoura FP #2", "q": 1}, {"b": "Port Said FP #1", "q": 6}, {"b": "New Cairo FP #1", "q": 28}, {"b": "New Cairo FP #2", "q": 9}, {"b": "New Cairo FP #3", "q": 24}, {"b": "New Cairo FP #4", "q": 26}, {"b": "New Cairo FP #5", "q": 23}, {"b": "New Cairo FP #6", "q": 18}, {"b": "New Cairo FP #7", "q": 31}, {"b": "New Cairo FP #8", "q": 16}, {"b": "Mokattam FP #1", "q": 15}, {"b": "Mokattam FP #2", "q": 15}, {"b": "Shorouk FP #1", "q": 11}, {"b": "Shorouk FP #2", "q": 14}, {"b": "Shorouk FP #3", "q": 5}, {"b": "Al Rehab City FP #1", "q": 15}, {"b": "Al Rehab City FP #2", "q": 15}, {"b": "Madinaty FP #1", "q": 8}, {"b": "Madinaty FP #2", "q": 11}, {"b": "Obour FP #1", "q": 22}, {"b": "Obour FP #2", "q": 9}, {"b": "Nasr City FP #1", "q": 18}, {"b": "Nasr City FP #2", "q": 21}, {"b": "Nasr City FP #3", "q": 8}, {"b": "Nasr City FP #4", "q": 18}, {"b": "Heliopolis FP #1", "q": 21}, {"b": "Heliopolis FP #2", "q": 11}, {"b": "Heliopolis FP #3", "q": 9}, {"b": "Heliopolis FP #4", "q": 5}, {"b": "Ain Shams FP #1", "q": 6}, {"b": "Sheraton FP #1", "q": 25}, {"b": "Nozha FP #1", "q": 12}, {"b": "6th of October FP #1", "q": 4}, {"b": "6th of October FP #2", "q": 19}, {"b": "6th of October FP #3", "q": 8}, {"b": "6th of October FP #4", "q": 17}, {"b": "6th of October FP #5", "q": 5}, {"b": "6th of October FP #6", "q": 22}, {"b": "6th of October FP #7", "q": 6}, {"b": "Sheikh Zayed City FP #1", "q": 25}, {"b": "Sheikh Zayed City FP #2", "q": 14}, {"b": "Sheikh Zayed City FP #3", "q": 17}, {"b": "Sheikh Zayed City FP #4", "q": 9}, {"b": "Hadayek El Ahram FP #1", "q": 8}, {"b": "Haram FP #1", "q": 10}, {"b": "Dokki FP #1", "q": 20}, {"b": "Haram FP #2", "q": 10}, {"b": "Garden City FP #1", "q": 19}, {"b": "Agouza FP #1", "q": 20}, {"b": "Al Manial FP #1", "q": 12}, {"b": "Maadi FP #1", "q": 17}, {"b": "Maadi FP #3", "q": 18}, {"b": "Maadi FP #4", "q": 19}, {"b": "Maadi FP #5", "q": 13}, {"b": "Helwan FP #1", "q": 9}, {"b": "Shobra FP #1", "q": 21}, {"b": "El-Zaher FP #1", "q": 29}, {"b": "Heliopolis FP #5", "q": 6}]}, {"n": "Classic Chicken Caesar Salad", "t": 847, "br": [{"b": "Alexandria FP #1", "q": 20}, {"b": "Alexandria FP #2", "q": 16}, {"b": "Alexandria FP #3", "q": 6}, {"b": "Mansoura FP #1", "q": 3}, {"b": "Mansoura FP #2", "q": 4}, {"b": "Port Said FP #1", "q": 8}, {"b": "New Cairo FP #1", "q": 32}, {"b": "New Cairo FP #2", "q": 10}, {"b": "New Cairo FP #3", "q": 16}, {"b": "New Cairo FP #4", "q": 21}, {"b": "New Cairo FP #5", "q": 17}, {"b": "New Cairo FP #6", "q": 18}, {"b": "New Cairo FP #7", "q": 40}, {"b": "New Cairo FP #8", "q": 14}, {"b": "Mokattam FP #1", "q": 11}, {"b": "Mokattam FP #2", "q": 11}, {"b": "Shorouk FP #1", "q": 9}, {"b": "Shorouk FP #2", "q": 11}, {"b": "Shorouk FP #3", "q": 9}, {"b": "Al Rehab City FP #1", "q": 11}, {"b": "Al Rehab City FP #2", "q": 10}, {"b": "Madinaty FP #1", "q": 6}, {"b": "Madinaty FP #2", "q": 11}, {"b": "Obour FP #1", "q": 22}, {"b": "Obour FP #2", "q": 15}, {"b": "Nasr City FP #1", "q": 19}, {"b": "Nasr City FP #2", "q": 20}, {"b": "Nasr City FP #3", "q": 8}, {"b": "Nasr City FP #4", "q": 14}, {"b": "Heliopolis FP #1", "q": 24}, {"b": "Heliopolis FP #2", "q": 12}, {"b": "Heliopolis FP #3", "q": 14}, {"b": "Heliopolis FP #4", "q": 8}, {"b": "Ain Shams FP #1", "q": 10}, {"b": "Sheraton FP #1", "q": 25}, {"b": "Nozha FP #1", "q": 7}, {"b": "6th of October FP #1", "q": 7}, {"b": "6th of October FP #2", "q": 16}, {"b": "6th of October FP #3", "q": 7}, {"b": "6th of October FP #4", "q": 13}, {"b": "6th of October FP #5", "q": 6}, {"b": "6th of October FP #6", "q": 22}, {"b": "6th of October FP #7", "q": 5}, {"b": "Sheikh Zayed City FP #1", "q": 18}, {"b": "Sheikh Zayed City FP #2", "q": 10}, {"b": "Sheikh Zayed City FP #3", "q": 12}, {"b": "Sheikh Zayed City FP #4", "q": 10}, {"b": "Hadayek El Ahram FP #1", "q": 10}, {"b": "Haram FP #1", "q": 10}, {"b": "Dokki FP #1", "q": 18}, {"b": "Haram FP #2", "q": 10}, {"b": "Garden City FP #1", "q": 16}, {"b": "Agouza FP #1", "q": 18}, {"b": "Al Manial FP #1", "q": 7}, {"b": "Maadi FP #1", "q": 21}, {"b": "Maadi FP #3", "q": 17}, {"b": "Maadi FP #4", "q": 19}, {"b": "Maadi FP #5", "q": 9}, {"b": "Helwan FP #1", "q": 10}, {"b": "Shobra FP #1", "q": 23}, {"b": "El-Zaher FP #1", "q": 17}, {"b": "Heliopolis FP #5", "q": 4}]}]};
+
+let state = { data: null, selected: [], currentBranch: null, done: {}, have: {} };
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem('salad_prep_v1');
+    if(raw){
+      const s = JSON.parse(raw);
+      state.data = s.data || null;
+      state.selected = s.selected || [];
+      state.done = s.done || {};
+      state.have = s.have || {};
+    }
+  }catch(e){}
+  if(!state.data) state.data = DEFAULT_DATA;
+}
+function saveState(){
+  try{
+    localStorage.setItem('salad_prep_v1', JSON.stringify({
+      data: state.data, selected: state.selected, done: state.done, have: state.have
+    }));
+  }catch(e){}
+}
+
+let activeTab = 'select';
+
+function toggleDone(item, branch){
+  state.done[item] = state.done[item] || {};
+  state.done[item][branch] = !state.done[item][branch];
+  saveState();
+  render();
+}
+
+function doneCount(item){
+  const it = state.data.items.find(i=>i.n===item);
+  if(!it) return {n:0,q:0,total:0};
+  let n=0,q=0;
+  it.br.forEach(b=>{ if(state.done[item] && state.done[item][b.b]){n++; q+=b.q;} });
+  return {n, q, total: it.br.length};
+}
+
+function itemFullyDoneForBranch(branch){
+  return state.selected.every(item=>{
+    const it = state.data.items.find(i=>i.n===item);
+    if(!it || !it.br.some(b=>b.b===branch)) return true;
+    return state.done[item] && state.done[item][branch];
+  });
+}
+
+function renderTabs(){
+  const bar = document.getElementById('tabsBar');
+  const tabs = [
+    {k:'select', t:'اختيار الأصناف'},
+    {k:'bybranch', t:'حسب الفرع'},
+    {k:'review', t:'مراجعة التوتال'},
+    {k:'paste', t:'تحديث الشيت'}
+  ];
+  bar.innerHTML = tabs.map(tb=>`<div class="tab ${activeTab===tb.k?'active':''}" data-tab="${tb.k}">${tb.t}</div>`).join('');
+  bar.querySelectorAll('.tab').forEach(el=>{
+    el.onclick = ()=>{ activeTab = el.dataset.tab; render(); };
+  });
+}
+
+function esc(s){ return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderSelect(){
+  let rows = state.data.items.map(it=>{
+    const checked = state.selected.includes(it.n) ? 'checked' : '';
+    return `<div class="item-select-row">
+      <label><input type="checkbox" data-item="${esc(it.n)}" ${checked}> ${esc(it.n)}</label>
+      <span class="cnt">${it.t}</span>
+    </div>`;
+  }).join('');
+  return `<div class="card"><div class="muted" style="margin-bottom:8px;">اختار الأصناف اللي هتحضرها النهارده</div>${rows}</div>`;
+}
+
+function renderPaste(){
+  return `
+  <div class="card">
+    <div class="upload-box" onclick="document.getElementById('excelFileInput').click()">
+      <div style="font-size:32px;margin-bottom:8px;">📁</div>
+      <div style="font-weight:700;font-size:16px;">ارفع الداش</div>
+      <div class="muted" style="margin-top:4px;">اضغط هنا لرفع ملف Excel (.xlsx, .xls, .csv)</div>
+      <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display:none;" />
+    </div>
+    <div id="pasteMsg" class="muted" style="margin-top:8px;font-weight:bold;text-align:center;"></div>
+  </div>`;
+}
+
+function renderByBranch(){
+  if(!state.selected.length) return `<div class="card muted">اختار أصناف الأول من تبويب "اختيار الأصناف"</div>`;
+  const branchSet = {};
+  state.selected.forEach(item=>{
+    const it = state.data.items.find(i=>i.n===item);
+    if(it) it.br.forEach(b=>{ branchSet[b.b] = branchSet[b.b] || []; branchSet[b.b].push({item, q:b.q}); });
+  });
+  const branches = Object.keys(branchSet).sort((a,b)=>{
+    const fa = itemFullyDoneForBranch(a), fb = itemFullyDoneForBranch(b);
+    return fa === fb ? a.localeCompare(b) : (fa ? 1 : -1);
+  });
+  if(!state.currentBranch || !branchSet[state.currentBranch]) state.currentBranch = branches[0];
+  const cur = state.currentBranch;
+  const list = branchSet[cur] || [];
+  const doneN = list.filter(x=> state.done[x.item] && state.done[x.item][cur]).length;
+  const full = itemFullyDoneForBranch(cur);
+  const opts = branches.map(br=>{
+    const f = itemFullyDoneForBranch(br);
+    return `<option value="${esc(br)}" ${cur===br?'selected':''}>${f?'✅ ':''}${esc(br)}</option>`;
+  }).join('');
+  const rows = list.map(x=>{
+    const isDone = !!(state.done[x.item] && state.done[x.item][cur]);
+    return `<div class="branch-row ${isDone?'done':''}" data-item="${esc(x.item)}" data-branch="${esc(cur)}">
+      <div style="display:flex;align-items:center;"><span class="check">${isDone?'✓':''}</span><span class="bname">${esc(x.item)}</span></div>
+      <span class="bqty">${x.q}</span>
+    </div>`;
+  }).join('');
+  return `<div class="sticky-sub"><select id="branchPicker">${opts}</select><div class="progress">${full?'✅ خلصت الفرع ده بالكامل':`خلصت ${doneN} من ${list.length} صنف`}</div></div><div class="card">${rows}</div>`;
+}
+
+function badgeHtml(dc, have){
+  if(have === undefined || have === null || have === '') return {cls:'warn', text:'اكتب العدد اللي قدامك'};
+  const diff = Number(have) - dc.q;
+  if(diff === 0) return {cls:'ok', text:`تصفييير ✓ (${dc.q})`};
+  
+  if(diff > 0) return {cls:'warn', text:`تخييييش (زيادة ${diff})`};
+  return {cls:'bad', text:`تخييييش (ناقص ${Math.abs(diff)})`};
+}
+
+function renderReview(){
+  if(!state.selected.length) return `<div class="card muted">اختار أصناف الأول من تبويب "اختيار الأصناف"</div>`;
+  const rows = state.selected.map((item,idx)=>{
+    const dc = doneCount(item);
+    const have = state.have[item];
+    const b = badgeHtml(dc, have);
+    return `<div class="review-row">
+      <div class="review-top"><div class="review-name">${esc(item)}</div><div class="review-sub">خلصت ${dc.n}/${dc.total} فرع</div></div>
+      <div class="review-body">
+        <input type="number" inputmode="numeric" value="${have!==undefined?esc(have):''}" data-item="${esc(item)}">
+        <div class="badge ${b.cls}" id="badge-${idx}">${b.text}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div>${rows}</div>`;
+}
+
+function render(){
+  renderTabs();
+  const app = document.getElementById('app');
+  if(activeTab==='select') app.innerHTML = renderSelect();
+  else if(activeTab==='bybranch') app.innerHTML = renderByBranch();
+  else if(activeTab==='review') app.innerHTML = renderReview();
+  else if(activeTab==='paste') app.innerHTML = renderPaste();
+  attachHandlers();
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.item-select-row input[type=checkbox]').forEach(cb=>{
+    cb.onchange = ()=>{
+      const name = cb.dataset.item;
+      if(cb.checked){ if(!state.selected.includes(name)) state.selected.push(name); }
+      else { state.selected = state.selected.filter(n=>n!==name); }
+      saveState();
+    };
+  });
+  
+  const excelInput = document.getElementById('excelFileInput');
+  if(excelInput){
+    excelInput.onchange = handleFileUpload;
+  }
+
+  const bpicker = document.getElementById('branchPicker');
+  if(bpicker) bpicker.onchange = ()=>{ state.currentBranch = bpicker.value; render(); };
+  
+  document.querySelectorAll('.branch-row').forEach(row=>{
+    row.onclick = ()=> toggleDone(row.dataset.item, row.dataset.branch);
+  });
+  
+  document.querySelectorAll('.review-body input').forEach((inp, idx)=>{
+    inp.oninput = ()=>{
+      const item = inp.dataset.item;
+      state.have[item] = inp.value;
+      saveState();
+      const dc = doneCount(item);
+      const b = badgeHtml(dc, inp.value);
+      const badgeEl = document.getElementById('badge-'+idx);
+      if(badgeEl){ badgeEl.className = 'badge '+b.cls; badgeEl.textContent = b.text; }
+    };
+  });
+}
+
+function parseRowsData(rows){
+  const header = rows[0];
+  const branches = header.slice(2).map(b=>String(b||'').trim());
+  const items = [];
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(!r || !r[0] || !String(r[0]).trim()) continue;
+    const br = [];
+    branches.forEach((b,idx)=>{
+      const raw2 = r[2+idx];
+      const q = raw2 !== undefined && raw2 !== null ? Number(String(raw2).replace(',','.')) : 0;
+      if(q > 0) br.push({b:b, q:q});
+    });
+    items.push({n:String(r[0]).trim(), t:Number(String(r[1]||'0').replace(',','.'))||0, br});
+  }
+  return {branches, items};
+}
+
+function handleFileUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      
+      const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+      
+      const parsed = parseRowsData(rows);
+      if(!parsed.items.length) throw new Error();
+      
+      state.data = parsed;
+      state.selected = []; state.done = {}; state.have = {}; state.currentBranch = null;
+      saveState();
+      
+      alert('تم تحديث البيانات بنجاح!');
+      activeTab = 'select';
+      render();
+    } catch(err) {
+      document.getElementById('pasteMsg').style.color = 'var(--danger)';
+      document.getElementById('pasteMsg').textContent = 'حدث خطأ أثناء قراءة الملف، تأكد من اختيار ملف إكسيل صحيح.';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+loadState();
+render();
+</script>
+</body>
+</html>
